@@ -1,9 +1,10 @@
-# Workflow untuk deploy BentoPDF dari Source Tag v2.8.8 ke GitHub Pages
 name: Deploy static content to Pages
 
 on:
   push:
     branches: ["main"]
+    paths:
+      - .github/workflow/deploy.yml
   workflow_dispatch:
 
 permissions:
@@ -31,7 +32,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      # 1. Download & Extract Source Code spesifik v2.8.8
       - name: Download and Extract specific source code release
         run: |
           curl -L https://github.com/alam00000/bentopdf/archive/refs/tags/v2.8.8.tar.gz -o bentopdf.tar.gz
@@ -46,7 +46,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # 2. Build dari source dengan menyertakan BASE_URL dan melewati SEO audit
       - name: Build distribution
         env:
           SIMPLE_MODE: "true"
@@ -54,32 +53,6 @@ jobs:
           SITE_URL: "https://arfshl.github.io/bentopdf"
         run: |
           npm run build
-
-      - name: Inject COOP/COEP Service Worker for WASM
-        run: |
-          curl -L https://raw.githubusercontent.com/gzguidotti/coi-serviceworker/main/coi-serviceworker.min.js -o dist/coi-serviceworker.min.js
-
-          cat << 'EOF' > dist/coi-loader.js
-          window.coi = {
-            shouldRegister: () => true,
-            shouldDeregister: () => false,
-            doCoep: () => true,
-            coepCredentialless: () => false,
-            quiet: false
-          };
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/bentopdf/coi-serviceworker.min.js', { scope: '/bentopdf/' })
-              .then(reg => {
-                if (reg.active && !navigator.serviceWorker.controller) {
-                  window.location.reload();
-                }
-              })
-              .catch(err => console.error('COI Registration failed:', err));
-          }
-          EOF
-
-          INJECT_TAG='<head><script src="/bentopdf/coi-loader.js"></script><script src="/bentopdf/coi-serviceworker.min.js"></script>'
-          find dist -name "*.html" -exec sed -i "s|<head>|${INJECT_TAG}|g" {} +
           
       - name: Setup Pages
         uses: actions/configure-pages@v6
