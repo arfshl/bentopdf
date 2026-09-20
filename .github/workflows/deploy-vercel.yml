@@ -3,6 +3,8 @@ name: Deploy BentoPDF to Vercel
 on:
   push:
     branches: ["main"]
+    paths:
+      - .github/workflow/deploy-vercel.yml
   workflow_dispatch:
 
 jobs:
