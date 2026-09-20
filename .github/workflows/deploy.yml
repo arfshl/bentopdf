@@ -48,12 +48,12 @@ jobs:
 
       # 2. Build dari source dengan menyertakan BASE_URL dan melewati SEO audit
       - name: Build distribution
+        env:
+          SIMPLE_MODE: "true"
+          BASE_URL: "bentopdf"
+          SITE_URL: "https://arfshl.github.io/bentopdf"
         run: |
-            export SIMPLE_MODE: "true"
-            export BASE_URL: "bentopdf"
-            export SITE_URL: "https://arfshl.github.io/bentopdf"
-            export HUSKY: "0"
-            npm run build
+          npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v6
