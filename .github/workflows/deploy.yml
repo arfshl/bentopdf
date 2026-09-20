@@ -55,6 +55,14 @@ jobs:
         run: |
           npm run build
 
+      - name: Inject COOP/COEP Service Worker for WASM
+        run: |
+          # Download
+          curl -L https://github.com/gzguidotti/coi-serviceworker/raw/main/coi-serviceworker.min.js -o dist/coi-serviceworker.min.js
+          
+          # Inject coi-serviceworker
+          find dist -name "*.html" -exec sed -i 's|<head>|<head><script src="/bentopdf/coi-serviceworker.min.js"></script>|g' {} +
+
       - name: Setup Pages
         uses: actions/configure-pages@v6
 
