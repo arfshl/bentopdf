@@ -57,12 +57,30 @@ jobs:
 
       - name: Inject COOP/COEP Service Worker for WASM
         run: |
-          # Download
-          curl -L https://github.com/gzguidotti/coi-serviceworker/raw/main/coi-serviceworker.min.js -o dist/coi-serviceworker.min.js
-          
-          # Inject coi-serviceworker
-          find dist -name "*.html" -exec sed -i 's|<head>|<head><script src="/bentopdf/coi-serviceworker.min.js"></script>|g' {} +
+          curl -L https://raw.githubusercontent.com/gzguidotti/coi-serviceworker/main/coi-serviceworker.min.js -o dist/coi-serviceworker.min.js
 
+          cat << 'EOF' > dist/coi-loader.js
+          window.coi = {
+            shouldRegister: () => true,
+            shouldDeregister: () => false,
+            doCoep: () => true,
+            coepCredentialless: () => false,
+            quiet: false
+          };
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/bentopdf/coi-serviceworker.min.js', { scope: '/bentopdf/' })
+              .then(reg => {
+                if (reg.active && !navigator.serviceWorker.controller) {
+                  window.location.reload();
+                }
+              })
+              .catch(err => console.error('COI Registration failed:', err));
+          }
+          EOF
+
+          INJECT_TAG='<head><script src="/bentopdf/coi-loader.js"></script><script src="/bentopdf/coi-serviceworker.min.js"></script>'
+          find dist -name "*.html" -exec sed -i "s|<head>|${INJECT_TAG}|g" {} +
+          
       - name: Setup Pages
         uses: actions/configure-pages@v6
 
