@@ -19,9 +19,10 @@ concurrency:
 
 env:
   SIMPLE_MODE: "true"
-  BASE_URL: "bentopdf"
+  BASE_URL: "bentopdf/"
   SITE_URL: "https://arfshl.github.io/bentopdf"
   HUSKY: "0"
+  ALLOW_INDEXING: "true"
 
 jobs:
   deploy:
@@ -58,9 +59,10 @@ jobs:
       - name: Build distribution
         env:
           SIMPLE_MODE: "true"
-          BASE_URL: "bentopdf"
+          BASE_URL: "bentopdf/"
           SITE_URL: "https://arfshl.github.io/bentopdf"
           HUSKY: "0"
+          ALLOW_INDEXING: "true"
         run: |
           npm run build
           
