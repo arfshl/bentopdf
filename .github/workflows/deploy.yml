@@ -21,7 +21,7 @@ env:
   SIMPLE_MODE: "true"
   BASE_URL: "bentopdf/"
   SITE_URL: "https://arfshl.github.io/bentopdf"
-  HUSKY: "0"
+  # HUSKY: "0"
   ALLOW_INDEXING: "true"
 
 jobs:
@@ -61,7 +61,7 @@ jobs:
           SIMPLE_MODE: "true"
           BASE_URL: "bentopdf/"
           SITE_URL: "https://arfshl.github.io/bentopdf"
-          HUSKY: "0"
+         # HUSKY: "0"
           ALLOW_INDEXING: "true"
         run: |
           npm run build
