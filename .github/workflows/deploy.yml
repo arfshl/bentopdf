@@ -1,11 +1,12 @@
 name: Deploy static content to Pages
 
 on:
-  push:
-    branches: ["main"]
-    paths:
-      - .github/workflow/deploy.yml
   workflow_dispatch:
+    inputs:
+      bentopdf_version:
+        description: "BentoPDF version to deploy (e.g. 2.8.8)"
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -32,9 +33,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Set BentoPDF version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "BENTOPDF_VERSION=${{ inputs.bentopdf_version }}" >> "$GITHUB_ENV"
+          else
+           exit 0
+          fi
+
       - name: Download and Extract specific source code release
         run: |
-          curl -L https://github.com/alam00000/bentopdf/archive/refs/tags/v2.8.8.tar.gz -o bentopdf.tar.gz
+          curl -L https://github.com/alam00000/bentopdf/archive/refs/tags/v${BENTOPDF_VERSION}.tar.gz -o bentopdf.tar.gz
           tar -xzf bentopdf.tar.gz --strip-components=1
           rm bentopdf.tar.gz
 
@@ -51,6 +60,7 @@ jobs:
           SIMPLE_MODE: "true"
           BASE_URL: "bentopdf"
           SITE_URL: "https://arfshl.github.io/bentopdf"
+          HUSKY: "0"
         run: |
           npm run build
           
